@@ -1,0 +1,135 @@
+# Generate the Xcode project with:  brew install xcodegen && xcodegen
+name: QuickCapture
+options:
+  bundleIdPrefix: com.example.quickcapture
+  deploymentTarget:
+    iOS: "18.0"
+    macOS: "15.0"
+    watchOS: "11.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""            # set your team ID
+    DEAD_CODE_STRIPPING: YES
+    SWIFT_OPTIMIZATION_LEVEL: "-O"  # (Debug overrides to -Onone)
+  configs:
+    Debug:
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+
+packages:
+  CaptureKit:
+    path: Packages/CaptureKit
+
+targets:
+  # ───────────── macOS: menu bar app, ⌥⌥⌥ + swirl ─────────────
+  QuickCaptureMac:
+    type: application
+    platform: macOS
+    sources: [Shared, macOS]
+    dependencies:
+      - package: CaptureKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quickcapture.mac
+        PRODUCT_NAME: QuickCapture
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Quick Capture
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: Listens while you dictate a quick note.
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: Turns your voice note into text on-device.
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: Adds the tasks from your notes to Reminders.
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: NO        # global ⌥ monitoring needs Accessibility, which the sandbox blocks
+        CODE_SIGN_ENTITLEMENTS: macOS/QuickCapture.entitlements
+
+  # ───────────── iOS: app + Action Button / Control Center / Siri ─────────────
+  QuickCapture:
+    type: application
+    platform: iOS
+    sources: [Shared, iOS]
+    dependencies:
+      - package: CaptureKit
+      - target: QuickCaptureWidgets
+      - target: QuickCaptureWatch
+    info:
+      path: iOS/Info.plist
+      properties:
+        CFBundleDisplayName: Quick Capture
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        CFBundleURLTypes:
+          - CFBundleURLName: com.example.quickcapture
+            CFBundleURLSchemes: [quickcapture]
+        NSMicrophoneUsageDescription: Listens while you dictate a quick note.
+        NSSpeechRecognitionUsageDescription: Turns your voice note into text on-device.
+        NSRemindersFullAccessUsageDescription: Adds the tasks from your notes to Reminders.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quickcapture
+        TARGETED_DEVICE_FAMILY: "1"
+
+  QuickCaptureWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - iOSWidgets
+      - iOS/StartCaptureIntent.swift
+    info:
+      path: iOSWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Quick Capture
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quickcapture.widgets
+        TARGETED_DEVICE_FAMILY: "1"
+
+  # ───────────── watchOS: record → hand off to iPhone ─────────────
+  QuickCaptureWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - watchOS
+      - Shared/CaptureOrb.swift
+    dependencies:
+      - target: QuickCaptureWatchWidgets
+    info:
+      path: watchOS/Info.plist
+      properties:
+        CFBundleDisplayName: Capture
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.example.quickcapture
+        NSMicrophoneUsageDescription: Records a quick voice note for your iPhone to turn into tasks.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quickcapture.watchkitapp
+
+  QuickCaptureWatchWidgets:
+    type: app-extension
+    platform: watchOS
+    sources: [watchWidgets]
+    info:
+      path: watchWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Capture
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quickcapture.watchkitapp.widgets
+
+schemes:
+  QuickCaptureMac:
+    build: { targets: { QuickCaptureMac: all } }
+    run: { config: Debug }
+  QuickCapture:
+    build: { targets: { QuickCapture: all } }
+    run: { config: Debug }
+  QuickCaptureWatch:
+    build: { targets: { QuickCaptureWatch: all } }
+    run: { config: Debug }
