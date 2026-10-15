@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pokémon Card Shop</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-row">
+      <div>
+        <h1 id="shop-name">Pokémon Card Shop</h1>
+        <p id="tagline" class="tagline"></p>
+      </div>
+      <button id="cart-button" class="cart-button" aria-controls="cart">
+        Cart <span id="cart-count" class="badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls" aria-label="Filter cards">
+      <input id="search" type="search" placeholder="Search by name or set…" aria-label="Search" />
+      <select id="set-filter" aria-label="Filter by set">
+        <option value="">All sets</option>
+      </select>
+      <select id="sort" aria-label="Sort">
+        <option value="name">Name A–Z</option>
+        <option value="price-asc">Price: low to high</option>
+        <option value="price-desc">Price: high to low</option>
+      </select>
+      <label class="checkbox">
+        <input id="in-stock" type="checkbox" /> In stock only
+      </label>
+    </section>
+
+    <p id="result-count" class="muted"></p>
+    <section id="card-grid" class="card-grid" aria-live="polite"></section>
+  </main>
+
+  <aside id="cart" class="cart" aria-hidden="true">
+    <div class="cart-header">
+      <h2>Your cart</h2>
+      <button id="close-cart" class="icon-button" aria-label="Close cart">×</button>
+    </div>
+    <ul id="cart-items" class="cart-items"></ul>
+    <div class="cart-footer">
+      <p class="total">Total: <strong id="cart-total">$0.00</strong></p>
+      <p id="shipping-note" class="muted small"></p>
+      <label class="small" for="buyer-name">Your name</label>
+      <input id="buyer-name" type="text" autocomplete="name" />
+      <label class="small" for="buyer-notes">Notes (shipping address, questions…)</label>
+      <textarea id="buyer-notes" rows="3"></textarea>
+      <button id="checkout" class="primary">Send order request</button>
+      <p class="muted small">This opens your email app with your order filled in. I'll reply with payment details and confirm availability.</p>
+    </div>
+  </aside>
+  <div id="backdrop" class="backdrop" hidden></div>
+
+  <footer class="site-footer wrap muted small">
+    <p>Card images via the Pokémon TCG API. Pokémon is © Nintendo / Creatures / GAME FREAK. This is a personal collection sale, not an official store.</p>
+  </footer>
+
+  <script src="cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
